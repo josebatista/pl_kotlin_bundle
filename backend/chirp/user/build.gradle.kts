@@ -1,8 +1,6 @@
 plugins {
-    alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.kotlin.spring)
-    alias(libs.plugins.spring.boot)
-    alias(libs.plugins.spring.dependency.management)
+    id("java-library")
+    alias(libs.plugins.chirp.spring.boot.service)
     alias(libs.plugins.kotlin.jpa)
 }
 

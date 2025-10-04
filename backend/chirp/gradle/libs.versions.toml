@@ -71,3 +71,7 @@ kotlin-spring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotl
 kotlin-jpa = { id = "org.jetbrains.kotlin.plugin.jpa", version.ref = "kotlin" }
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
 spring-dependency-management = { id = "io.spring.dependency-management", version.ref = "spring-dependency-management" }
+
+# Convention PLugin
+chirp-kotlin-common = { id = "chirp.kotlin-common" }
+chirp-spring-boot-service = { id = "chirp.spring-boot-service" }

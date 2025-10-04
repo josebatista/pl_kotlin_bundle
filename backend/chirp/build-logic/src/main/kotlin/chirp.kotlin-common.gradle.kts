@@ -3,9 +3,9 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    alias(libraries.findPlugin("kotlin.jvm").get())
-    alias(libraries.findPlugin("kotlin.spring").get())
-    alias(libraries.findPlugin("spring.dependency.management").get())
+    kotlin("jvm")
+    kotlin("plugin.spring")
+    id("io.spring.dependency-management")
 }
 
 repositories {
