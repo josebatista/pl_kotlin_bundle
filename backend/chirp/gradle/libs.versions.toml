@@ -74,4 +74,5 @@ spring-dependency-management = { id = "io.spring.dependency-management", version
 
 # Convention PLugin
 chirp-kotlin-common = { id = "chirp.kotlin-common" }
+chirp-spring-boot-app = { id = "chirp.spring-boot-app" }
 chirp-spring-boot-service = { id = "chirp.spring-boot-service" }
