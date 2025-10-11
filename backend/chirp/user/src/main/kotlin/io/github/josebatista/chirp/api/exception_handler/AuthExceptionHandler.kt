@@ -1,6 +1,7 @@
 package io.github.josebatista.chirp.api.exception_handler
 
 import io.github.josebatista.chirp.domain.exception.EncodePasswordException
+import io.github.josebatista.chirp.domain.exception.InvalidTokenException
 import io.github.josebatista.chirp.domain.exception.UserAlreadyExistsException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -48,6 +49,20 @@ class AuthExceptionHandler {
                 mapOf(
                     "code" to "VALIDATION_ERROR",
                     "error" to "Verify your password"
+                )
+            )
+    }
+
+    @ExceptionHandler(InvalidTokenException::class)
+    fun onInvalidTokenException(
+        e: InvalidTokenException
+    ): ResponseEntity<Map<String, Any>> {
+        return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
+            .body(
+                mapOf(
+                    "code" to "INVALID_TOKEN",
+                    "error" to e.localizedMessage
                 )
             )
     }
