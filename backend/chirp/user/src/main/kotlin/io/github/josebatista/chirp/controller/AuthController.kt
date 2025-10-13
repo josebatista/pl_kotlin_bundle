@@ -1,7 +1,10 @@
 package io.github.josebatista.chirp.controller
 
+import io.github.josebatista.chirp.api.dto.AuthenticatedUserDto
+import io.github.josebatista.chirp.api.dto.LoginRequest
 import io.github.josebatista.chirp.api.dto.RegisterRequest
 import io.github.josebatista.chirp.api.dto.UserDto
+import io.github.josebatista.chirp.api.mappers.toAuthenticatedUserDto
 import io.github.josebatista.chirp.api.mappers.toUserDto
 import io.github.josebatista.chirp.service.AuthService
 import jakarta.validation.Valid
@@ -25,5 +28,15 @@ class AuthController(
             username = body.username,
             password = body.password
         ).toUserDto()
+    }
+
+    @PostMapping("/login")
+    fun login(
+        @Valid @RequestBody body: LoginRequest
+    ): AuthenticatedUserDto {
+        return authService.login(
+            email = body.email,
+            password = body.password
+        ).toAuthenticatedUserDto()
     }
 }
