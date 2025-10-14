@@ -2,6 +2,7 @@ package io.github.josebatista.chirp.service
 
 import io.github.josebatista.chirp.domain.exception.EncodePasswordException
 import io.github.josebatista.chirp.domain.exception.InvalidCredentialsException
+import io.github.josebatista.chirp.domain.exception.InvalidTokenException
 import io.github.josebatista.chirp.domain.exception.UserAlreadyExistsException
 import io.github.josebatista.chirp.domain.exception.UserNotFoundException
 import io.github.josebatista.chirp.domain.model.AuthenticatedUser
@@ -13,7 +14,9 @@ import io.github.josebatista.chirp.infra.database.mappers.toUser
 import io.github.josebatista.chirp.infra.database.repositories.RefreshTokenRepository
 import io.github.josebatista.chirp.infra.database.repositories.UserRepository
 import io.github.josebatista.chirp.infra.security.PasswordEncoder
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.security.MessageDigest
 import java.time.Instant
 import java.util.Base64
@@ -61,6 +64,29 @@ class AuthService(
         } ?: throw UserNotFoundException()
     }
 
+    @Transactional
+    fun refreshToken(refreshToken: String): AuthenticatedUser {
+        if (!jwtService.validateRefreshToken(token = refreshToken)) {
+            throw InvalidTokenException(message = INVALID_REFRESH_TOKEN_MESSAGE)
+        }
+        val userId = jwtService.getUserIdFromToken(token = refreshToken)
+        val user = userRepository.findByIdOrNull(userId) ?: throw UserNotFoundException()
+        val hashed = hashToken(token = refreshToken)
+        return user.id?.let { userId ->
+            refreshTokenRepository.findByUserIdAndHashedToken(userId = userId, hashedToken = hashed)
+                ?: throw InvalidTokenException(message = INVALID_REFRESH_TOKEN_MESSAGE)
+            refreshTokenRepository.deleteByUserIdAndHashedToken(userId = userId, hashedToken = hashed)
+            val accessToken = jwtService.generateAccessToken(userId = userId)
+            val refreshToken = jwtService.generateRefreshToken(userId = userId)
+            storeRefreshToken(userId = userId, token = refreshToken)
+            AuthenticatedUser(
+                user = user.toUser(),
+                accessToken = accessToken,
+                refreshToken = refreshToken
+            )
+        } ?: throw UserNotFoundException()
+    }
+
     private fun storeRefreshToken(userId: UserId, token: String) {
         val hashed = hashToken(token = token)
         val expiry = jwtService.refreshTokenValidityMs
@@ -82,6 +108,8 @@ class AuthService(
 
     private companion object {
         const val DIGEST_ALGORITHM = "SHA-256"
+
+        const val INVALID_REFRESH_TOKEN_MESSAGE = "Invalid refresh token"
 
         // Pre-computed BCrypt hash of "dummy-password-to-prevent-timing-attack"
         // Uses cost factor 10 (2^10 rounds) to match production password encoder settings

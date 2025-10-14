@@ -2,6 +2,7 @@ package io.github.josebatista.chirp.controller
 
 import io.github.josebatista.chirp.api.dto.AuthenticatedUserDto
 import io.github.josebatista.chirp.api.dto.LoginRequest
+import io.github.josebatista.chirp.api.dto.RefreshRequest
 import io.github.josebatista.chirp.api.dto.RegisterRequest
 import io.github.josebatista.chirp.api.dto.UserDto
 import io.github.josebatista.chirp.api.mappers.toAuthenticatedUserDto
@@ -38,5 +39,12 @@ class AuthController(
             email = body.email,
             password = body.password
         ).toAuthenticatedUserDto()
+    }
+
+    @PostMapping("/refresh")
+    fun refresh(
+        @Valid @RequestBody body: RefreshRequest
+    ): AuthenticatedUserDto {
+        return authService.refreshToken(refreshToken = body.refreshToken).toAuthenticatedUserDto()
     }
 }
