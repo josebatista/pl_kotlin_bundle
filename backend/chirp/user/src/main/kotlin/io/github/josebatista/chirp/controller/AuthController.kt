@@ -47,4 +47,11 @@ class AuthController(
     ): AuthenticatedUserDto {
         return authService.refreshToken(refreshToken = body.refreshToken).toAuthenticatedUserDto()
     }
+
+    @PostMapping("/logout")
+    fun logout(
+        @Valid @RequestBody body: RefreshRequest
+    ) {
+        authService.logout(refreshToken = body.refreshToken)
+    }
 }
