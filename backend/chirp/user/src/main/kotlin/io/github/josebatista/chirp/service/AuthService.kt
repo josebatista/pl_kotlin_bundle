@@ -1,5 +1,6 @@
 package io.github.josebatista.chirp.service
 
+import io.github.josebatista.chirp.domain.exception.EmailNotVerifiedException
 import io.github.josebatista.chirp.domain.exception.EncodePasswordException
 import io.github.josebatista.chirp.domain.exception.InvalidCredentialsException
 import io.github.josebatista.chirp.domain.exception.InvalidTokenException
@@ -27,19 +28,24 @@ class AuthService(
     private val passwordEncoder: PasswordEncoder,
     private val jwtService: JwtService,
     private val refreshTokenRepository: RefreshTokenRepository,
+    private val emailVerificationTokenService: EmailVerificationTokenService
 ) {
 
+    @Transactional
     fun register(email: String, username: String, password: String): User {
-        userRepository.findByEmailOrUsername(email = email, username = username)
+        val trimmedEmail = email.trim()
+        userRepository.findByEmailOrUsername(email = trimmedEmail, username = username)
             ?.let { throw UserAlreadyExistsException() }
         val encodedPassword = passwordEncoder.encode(password) ?: throw EncodePasswordException()
-        return userRepository.save(
+        val savedUser = userRepository.saveAndFlush(
             UserEntity(
-                email = email,
+                email = trimmedEmail,
                 username = username,
                 hashedPassword = encodedPassword
             )
         ).toUser()
+        emailVerificationTokenService.createToken(email)
+        return savedUser
     }
 
     fun login(email: String, password: String): AuthenticatedUser {
@@ -51,7 +57,7 @@ class AuthService(
         if (user == null || !passwordMatches) {
             throw InvalidCredentialsException()
         }
-        // TODO: check for verified email.
+        if (!user.hasVerifiedEmail) throw EmailNotVerifiedException()
         return user.id?.let { userId ->
             val accessToken = jwtService.generateAccessToken(userId = userId)
             val refreshToken = jwtService.generateRefreshToken(userId = userId)

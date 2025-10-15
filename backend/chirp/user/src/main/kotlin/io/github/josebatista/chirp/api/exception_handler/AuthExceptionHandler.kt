@@ -1,5 +1,6 @@
 package io.github.josebatista.chirp.api.exception_handler
 
+import io.github.josebatista.chirp.domain.exception.EmailNotVerifiedException
 import io.github.josebatista.chirp.domain.exception.EncodePasswordException
 import io.github.josebatista.chirp.domain.exception.InvalidCredentialsException
 import io.github.josebatista.chirp.domain.exception.InvalidTokenException
@@ -97,6 +98,20 @@ class AuthExceptionHandler {
             )
     }
 
+    @ExceptionHandler(EmailNotVerifiedException::class)
+    fun onEmailNotVerified(
+        e: EmailNotVerifiedException
+    ): ResponseEntity<Map<String, Any>> {
+        return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
+            .body(
+                mapOf(
+                    RETURN_CODE_KEY to EMAIL_NOT_VERIFIED_CODE,
+                    RETURN_MESSAGE_KEY to e.localizedMessage
+                )
+            )
+    }
+
     private companion object {
         const val DEFAULT_ERROR_MESSAGE = "Invalid value"
         const val RETURN_CODE_KEY = "code"
@@ -107,5 +122,6 @@ class AuthExceptionHandler {
         const val VALIDATION_ERROR_CODE = "VALIDATION_ERROR"
         const val INVALID_TOKEN_CODE = "INVALID_TOKEN"
         const val INVALID_CREDENTIALS_CODE = "INVALID_CREDENTIALS"
+        const val EMAIL_NOT_VERIFIED_CODE = "EMAIL_NOT_VERIFIED"
     }
 }

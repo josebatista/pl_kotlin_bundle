@@ -8,16 +8,20 @@ import io.github.josebatista.chirp.api.dto.UserDto
 import io.github.josebatista.chirp.api.mappers.toAuthenticatedUserDto
 import io.github.josebatista.chirp.api.mappers.toUserDto
 import io.github.josebatista.chirp.service.AuthService
+import io.github.josebatista.chirp.service.EmailVerificationTokenService
 import jakarta.validation.Valid
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/auth")
 class AuthController(
-    private val authService: AuthService
+    private val authService: AuthService,
+    private val emailVerificationTokenService: EmailVerificationTokenService
 ) {
 
     @PostMapping("/register")
@@ -53,5 +57,12 @@ class AuthController(
         @Valid @RequestBody body: RefreshRequest
     ) {
         authService.logout(refreshToken = body.refreshToken)
+    }
+
+    @GetMapping("/verify")
+    fun verifyEmail(
+        @RequestParam token: String
+    ) {
+        emailVerificationTokenService.verifyEmail(token = token)
     }
 }
