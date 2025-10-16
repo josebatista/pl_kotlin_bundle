@@ -4,6 +4,7 @@ import io.github.josebatista.chirp.domain.exception.EmailNotVerifiedException
 import io.github.josebatista.chirp.domain.exception.EncodePasswordException
 import io.github.josebatista.chirp.domain.exception.InvalidCredentialsException
 import io.github.josebatista.chirp.domain.exception.InvalidTokenException
+import io.github.josebatista.chirp.domain.exception.SamePasswordException
 import io.github.josebatista.chirp.domain.exception.UserAlreadyExistsException
 import io.github.josebatista.chirp.domain.exception.UserNotFoundException
 import org.springframework.http.HttpStatus
@@ -112,6 +113,20 @@ class AuthExceptionHandler {
             )
     }
 
+    @ExceptionHandler(SamePasswordException::class)
+    fun onSamePassword(
+        e: SamePasswordException
+    ): ResponseEntity<Map<String, Any>> {
+        return ResponseEntity
+            .status(HttpStatus.CONFLICT)
+            .body(
+                mapOf(
+                    RETURN_CODE_KEY to SAME_PASSWORD_CODE,
+                    RETURN_MESSAGE_KEY to e.localizedMessage
+                )
+            )
+    }
+
     private companion object {
         const val DEFAULT_ERROR_MESSAGE = "Invalid value"
         const val RETURN_CODE_KEY = "code"
@@ -123,5 +138,6 @@ class AuthExceptionHandler {
         const val INVALID_TOKEN_CODE = "INVALID_TOKEN"
         const val INVALID_CREDENTIALS_CODE = "INVALID_CREDENTIALS"
         const val EMAIL_NOT_VERIFIED_CODE = "EMAIL_NOT_VERIFIED"
+        const val SAME_PASSWORD_CODE = "SAME_PASSWORD"
     }
 }

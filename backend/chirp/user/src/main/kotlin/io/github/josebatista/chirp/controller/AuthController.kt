@@ -1,14 +1,18 @@
 package io.github.josebatista.chirp.controller
 
 import io.github.josebatista.chirp.api.dto.AuthenticatedUserDto
+import io.github.josebatista.chirp.api.dto.ChangePasswordRequest
+import io.github.josebatista.chirp.api.dto.EmailRequest
 import io.github.josebatista.chirp.api.dto.LoginRequest
 import io.github.josebatista.chirp.api.dto.RefreshRequest
 import io.github.josebatista.chirp.api.dto.RegisterRequest
+import io.github.josebatista.chirp.api.dto.ResetPasswordRequest
 import io.github.josebatista.chirp.api.dto.UserDto
 import io.github.josebatista.chirp.api.mappers.toAuthenticatedUserDto
 import io.github.josebatista.chirp.api.mappers.toUserDto
 import io.github.josebatista.chirp.service.AuthService
 import io.github.josebatista.chirp.service.EmailVerificationTokenService
+import io.github.josebatista.chirp.service.PasswordResetService
 import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -21,7 +25,8 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/auth")
 class AuthController(
     private val authService: AuthService,
-    private val emailVerificationTokenService: EmailVerificationTokenService
+    private val emailVerificationTokenService: EmailVerificationTokenService,
+    private val passwordResetService: PasswordResetService,
 ) {
 
     @PostMapping("/register")
@@ -64,5 +69,26 @@ class AuthController(
         @RequestParam token: String
     ) {
         emailVerificationTokenService.verifyEmail(token = token)
+    }
+
+    @PostMapping("/forgot-password")
+    fun forgotEmail(
+        @Valid @RequestBody body: EmailRequest
+    ) {
+        passwordResetService.requestPasswordReset(body.email)
+    }
+
+    @PostMapping("/reset-password")
+    fun resetPassword(
+        @Valid @RequestBody body: ResetPasswordRequest
+    ) {
+        passwordResetService.resetToken(token = body.token, newPassword = body.newPassword)
+    }
+
+    @PostMapping("/change-password")
+    fun changePassword(
+        @Valid @RequestBody body: ChangePasswordRequest
+    ) {
+        // TODO: Extract request user id and call service
     }
 }
