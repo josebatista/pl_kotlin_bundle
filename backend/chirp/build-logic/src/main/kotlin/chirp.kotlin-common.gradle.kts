@@ -8,11 +8,11 @@ plugins {
     id("io.spring.dependency-management")
 }
 
-//dependencyManagement {
-//    imports {
-//        mavenBom("org.springframework.boot:spring-boot-dependencies:${libraries.findVersion("spring-boot").get()}")
-//    }
-//}
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.boot:spring-boot-dependencies:${libraries.findVersion("spring-boot").get()}")
+    }
+}
 
 configure<KotlinJvmProjectExtension> {
     jvmToolchain(21)
