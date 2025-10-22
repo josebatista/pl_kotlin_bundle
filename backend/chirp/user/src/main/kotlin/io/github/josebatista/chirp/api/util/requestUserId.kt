@@ -1,0 +1,8 @@
+package io.github.josebatista.chirp.api.util
+
+import io.github.josebatista.chirp.domain.exception.UnauthorizedException
+import io.github.josebatista.chirp.domain.model.UserId
+import org.springframework.security.core.context.SecurityContextHolder
+
+val requestUserId: UserId
+    get() = SecurityContextHolder.getContext().authentication?.principal as? UserId ?: throw UnauthorizedException()

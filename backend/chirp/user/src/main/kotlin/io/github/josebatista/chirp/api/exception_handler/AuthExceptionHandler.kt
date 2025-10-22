@@ -4,7 +4,9 @@ import io.github.josebatista.chirp.domain.exception.EmailNotVerifiedException
 import io.github.josebatista.chirp.domain.exception.EncodePasswordException
 import io.github.josebatista.chirp.domain.exception.InvalidCredentialsException
 import io.github.josebatista.chirp.domain.exception.InvalidTokenException
+import io.github.josebatista.chirp.domain.exception.RateLimitException
 import io.github.josebatista.chirp.domain.exception.SamePasswordException
+import io.github.josebatista.chirp.domain.exception.UnauthorizedException
 import io.github.josebatista.chirp.domain.exception.UserAlreadyExistsException
 import io.github.josebatista.chirp.domain.exception.UserNotFoundException
 import org.springframework.http.HttpStatus
@@ -127,6 +129,34 @@ class AuthExceptionHandler {
             )
     }
 
+    @ExceptionHandler(RateLimitException::class)
+    fun onRateLimit(
+        e: RateLimitException
+    ): ResponseEntity<Map<String, Any>> {
+        return ResponseEntity
+            .status(HttpStatus.TOO_MANY_REQUESTS)
+            .body(
+                mapOf(
+                    RETURN_CODE_KEY to RATE_LIMIT_EXCEEDED_CODE,
+                    RETURN_MESSAGE_KEY to e.localizedMessage
+                )
+            )
+    }
+
+    @ExceptionHandler(UnauthorizedException::class)
+    fun onUnauthorized(
+        e: UnauthorizedException
+    ): ResponseEntity<Map<String, Any>> {
+        return ResponseEntity
+            .status(HttpStatus.UNAUTHORIZED)
+            .body(
+                mapOf(
+                    RETURN_CODE_KEY to UNAUTHORIZED_ERROR_CODE,
+                    RETURN_MESSAGE_KEY to e.localizedMessage
+                )
+            )
+    }
+
     private companion object {
         const val DEFAULT_ERROR_MESSAGE = "Invalid value"
         const val RETURN_CODE_KEY = "code"
@@ -139,5 +169,7 @@ class AuthExceptionHandler {
         const val INVALID_CREDENTIALS_CODE = "INVALID_CREDENTIALS"
         const val EMAIL_NOT_VERIFIED_CODE = "EMAIL_NOT_VERIFIED"
         const val SAME_PASSWORD_CODE = "SAME_PASSWORD"
+        const val RATE_LIMIT_EXCEEDED_CODE = "RATE_LIMIT_EXCEEDED"
+        const val UNAUTHORIZED_ERROR_CODE = "UNAUTHORIZED"
     }
 }
