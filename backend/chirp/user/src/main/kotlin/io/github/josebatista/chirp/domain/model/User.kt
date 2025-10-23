@@ -1,8 +1,6 @@
 package io.github.josebatista.chirp.domain.model
 
-import java.util.UUID
-
-typealias UserId = UUID
+import io.github.josebatista.chirp.domain.type.UserId
 
 data class User(
     val id: UserId,

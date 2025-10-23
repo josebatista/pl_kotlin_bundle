@@ -1,6 +1,6 @@
 package io.github.josebatista.chirp.api.dto
 
-import io.github.josebatista.chirp.domain.model.UserId
+import io.github.josebatista.chirp.domain.type.UserId
 
 data class UserDto(
     val id: UserId,

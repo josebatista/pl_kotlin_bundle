@@ -1,7 +1,7 @@
 package io.github.josebatista.chirp.service
 
 import io.github.josebatista.chirp.domain.exception.InvalidTokenException
-import io.github.josebatista.chirp.domain.model.UserId
+import io.github.josebatista.chirp.domain.type.UserId
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys

@@ -5,7 +5,7 @@ import io.github.josebatista.chirp.domain.exception.InvalidCredentialsException
 import io.github.josebatista.chirp.domain.exception.InvalidTokenException
 import io.github.josebatista.chirp.domain.exception.SamePasswordException
 import io.github.josebatista.chirp.domain.exception.UserNotFoundException
-import io.github.josebatista.chirp.domain.model.UserId
+import io.github.josebatista.chirp.domain.type.UserId
 import io.github.josebatista.chirp.infra.database.entity.PasswordResetTokenEntity
 import io.github.josebatista.chirp.infra.database.repositories.PasswordResetTokenRepository
 import io.github.josebatista.chirp.infra.database.repositories.RefreshTokenRepository
