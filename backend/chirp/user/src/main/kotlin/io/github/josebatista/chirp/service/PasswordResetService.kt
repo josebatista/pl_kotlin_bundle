@@ -1,5 +1,6 @@
 package io.github.josebatista.chirp.service
 
+import io.github.josebatista.chirp.domain.events.user.UserEvent
 import io.github.josebatista.chirp.domain.exception.EncodePasswordException
 import io.github.josebatista.chirp.domain.exception.InvalidCredentialsException
 import io.github.josebatista.chirp.domain.exception.InvalidTokenException
@@ -10,6 +11,7 @@ import io.github.josebatista.chirp.infra.database.entity.PasswordResetTokenEntit
 import io.github.josebatista.chirp.infra.database.repositories.PasswordResetTokenRepository
 import io.github.josebatista.chirp.infra.database.repositories.RefreshTokenRepository
 import io.github.josebatista.chirp.infra.database.repositories.UserRepository
+import io.github.josebatista.chirp.infra.message_queue.EventPublisher
 import io.github.josebatista.chirp.infra.security.PasswordEncoder
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.repository.findByIdOrNull
@@ -25,7 +27,8 @@ class PasswordResetService(
     private val passwordResetTokenRepository: PasswordResetTokenRepository,
     private val passwordEncoder: PasswordEncoder,
     private val refreshTokenRepository: RefreshTokenRepository,
-    @param:Value($$"${chirp.email.reset-password.expiry-minutes}") private val expiryMinutes: Long
+    @param:Value($$"${chirp.email.reset-password.expiry-minutes}") private val expiryMinutes: Long,
+    private val eventPublisher: EventPublisher
 ) {
 
     @Transactional
@@ -37,7 +40,15 @@ class PasswordResetService(
             expiresAt = Instant.now().plus(expiryMinutes, ChronoUnit.MINUTES)
         )
         passwordResetTokenRepository.save(token)
-        // TODO: Inform notification service about password reset trigger to send email
+        eventPublisher.publish(
+            event = UserEvent.RequestResetPassword(
+                userId = user.id!!,
+                email = user.email,
+                username = user.username,
+                passwordResetToken = token.token,
+                expiresInMinutes = expiryMinutes
+            )
+        )
     }
 
     @Transactional
