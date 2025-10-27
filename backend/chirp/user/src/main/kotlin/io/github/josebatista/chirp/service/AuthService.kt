@@ -1,5 +1,6 @@
 package io.github.josebatista.chirp.service
 
+import io.github.josebatista.chirp.domain.events.user.UserEvent
 import io.github.josebatista.chirp.domain.exception.EmailNotVerifiedException
 import io.github.josebatista.chirp.domain.exception.EncodePasswordException
 import io.github.josebatista.chirp.domain.exception.InvalidCredentialsException
@@ -8,12 +9,13 @@ import io.github.josebatista.chirp.domain.exception.UserAlreadyExistsException
 import io.github.josebatista.chirp.domain.exception.UserNotFoundException
 import io.github.josebatista.chirp.domain.model.AuthenticatedUser
 import io.github.josebatista.chirp.domain.model.User
-import io.github.josebatista.chirp.domain.model.UserId
+import io.github.josebatista.chirp.domain.type.UserId
 import io.github.josebatista.chirp.infra.database.entity.RefreshTokenEntity
 import io.github.josebatista.chirp.infra.database.entity.UserEntity
 import io.github.josebatista.chirp.infra.database.mappers.toUser
 import io.github.josebatista.chirp.infra.database.repositories.RefreshTokenRepository
 import io.github.josebatista.chirp.infra.database.repositories.UserRepository
+import io.github.josebatista.chirp.infra.message_queue.EventPublisher
 import io.github.josebatista.chirp.infra.security.PasswordEncoder
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -28,7 +30,8 @@ class AuthService(
     private val passwordEncoder: PasswordEncoder,
     private val jwtService: JwtService,
     private val refreshTokenRepository: RefreshTokenRepository,
-    private val emailVerificationTokenService: EmailVerificationTokenService
+    private val emailVerificationTokenService: EmailVerificationTokenService,
+    private val eventPublisher: EventPublisher
 ) {
 
     @Transactional
@@ -44,7 +47,15 @@ class AuthService(
                 hashedPassword = encodedPassword
             )
         ).toUser()
-        emailVerificationTokenService.createToken(email)
+        val token = emailVerificationTokenService.createVerificationToken(trimmedEmail)
+        eventPublisher.publish(
+            event = UserEvent.Created(
+                userId = savedUser.id,
+                email = savedUser.email,
+                username = savedUser.username,
+                verificationToken = token.token
+            )
+        )
         return savedUser
     }
 

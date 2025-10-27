@@ -1,7 +1,7 @@
 package io.github.josebatista.chirp.api.util
 
 import io.github.josebatista.chirp.domain.exception.UnauthorizedException
-import io.github.josebatista.chirp.domain.model.UserId
+import io.github.josebatista.chirp.domain.type.UserId
 import org.springframework.security.core.context.SecurityContextHolder
 
 val requestUserId: UserId

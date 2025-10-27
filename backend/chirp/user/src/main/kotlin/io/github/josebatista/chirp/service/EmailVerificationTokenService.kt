@@ -1,5 +1,6 @@
 package io.github.josebatista.chirp.service
 
+import io.github.josebatista.chirp.domain.events.user.UserEvent
 import io.github.josebatista.chirp.domain.exception.InvalidTokenException
 import io.github.josebatista.chirp.domain.exception.UserNotFoundException
 import io.github.josebatista.chirp.domain.model.EmailVerificationToken
@@ -7,6 +8,7 @@ import io.github.josebatista.chirp.infra.database.entity.EmailVerificationTokenE
 import io.github.josebatista.chirp.infra.database.mappers.toEmailVerificationToken
 import io.github.josebatista.chirp.infra.database.repositories.EmailVerificationTokenRepository
 import io.github.josebatista.chirp.infra.database.repositories.UserRepository
+import io.github.josebatista.chirp.infra.message_queue.EventPublisher
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
@@ -18,15 +20,26 @@ import java.time.temporal.ChronoUnit
 class EmailVerificationTokenService(
     private val emailVerificationTokenRepository: EmailVerificationTokenRepository,
     private val userRepository: UserRepository,
-    @param:Value($$"${chirp.email.verification.expiry-hours}") private val expiryHours: Long
+    @param:Value($$"${chirp.email.verification.expiry-hours}") private val expiryHours: Long,
+    private val eventPublisher: EventPublisher
 ) {
 
+    @Transactional
     fun resendVerificationEmail(email: String) {
-        // TODO: Trigger resend
+        val token = createVerificationToken(email = email)
+        if (token.user.hasEmailVerified) return
+        eventPublisher.publish(
+            event = UserEvent.RequestResendVerification(
+                userId = token.user.id,
+                email = token.user.email,
+                username = token.user.username,
+                verificationToken = token.token
+            )
+        )
     }
 
     @Transactional
-    fun createToken(email: String): EmailVerificationToken {
+    fun createVerificationToken(email: String): EmailVerificationToken {
         val userEntity = userRepository.findByEmail(email = email) ?: throw UserNotFoundException()
         emailVerificationTokenRepository.invalidateActiveTokensForUser(user = userEntity)
         val token = EmailVerificationTokenEntity(
