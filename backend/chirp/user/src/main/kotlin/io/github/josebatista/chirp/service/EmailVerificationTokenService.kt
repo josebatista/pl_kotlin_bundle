@@ -57,6 +57,13 @@ class EmailVerificationTokenService(
         if (verificationToken.isExpired) throw InvalidTokenException(message = "Email verification token has already expired.")
         emailVerificationTokenRepository.save(verificationToken.apply { usedAt = Instant.now() })
         userRepository.save(verificationToken.user.apply { hasVerifiedEmail = true })
+        eventPublisher.publish(
+            event = UserEvent.Verified(
+                userId = verificationToken.user.id!!,
+                email = verificationToken.user.email,
+                username = verificationToken.user.username,
+            )
+        )
     }
 
     @Scheduled(cron = "0 0 3 * * * ")
