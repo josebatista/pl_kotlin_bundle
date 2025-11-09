@@ -14,7 +14,7 @@ spring:
   datasource:
     url: ${DATABASE_URL}
     username: ${DATABASE_USERNAME}
-    password: ${DATABASE_PASSWORD} # EB3sFsandRZ7Y8Ra
+    password: ${DATABASE_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
     hikari:
@@ -88,3 +88,7 @@ nginx:
     - "::1" # IPv6 localhost
     - "172.17.0.0/16" # NGINX container IP when using docker
     - "10.0.0.5/32" # NGINX server IP (if separate machine)
+
+supabase:
+  url: ${SUPABASE_URL}
+  service-key: ${SUPABASE_SERVICE_KEY}

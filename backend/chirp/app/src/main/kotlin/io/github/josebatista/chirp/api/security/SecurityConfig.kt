@@ -1,4 +1,4 @@
-package io.github.josebatista.chirp.security
+package io.github.josebatista.chirp.api.security
 
 import io.github.josebatista.chirp.api.config.JwtAuthFilter
 import jakarta.servlet.DispatcherType
