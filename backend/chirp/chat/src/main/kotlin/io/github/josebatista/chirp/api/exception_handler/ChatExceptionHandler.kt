@@ -5,7 +5,9 @@ import io.github.josebatista.chirp.api.exception_handler.util.CommonExceptionKey
 import io.github.josebatista.chirp.domain.exception.ChatNotFoundException
 import io.github.josebatista.chirp.domain.exception.ChatParticipantNotFoundException
 import io.github.josebatista.chirp.domain.exception.InvalidChatSizeException
+import io.github.josebatista.chirp.domain.exception.InvalidProfilePictureException
 import io.github.josebatista.chirp.domain.exception.MessageNotFoundException
+import io.github.josebatista.chirp.domain.exception.StorageException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -38,8 +40,24 @@ class ChatExceptionHandler {
         RETURN_MESSAGE_KEY to e.localizedMessage
     )
 
+    @ExceptionHandler(InvalidProfilePictureException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun onInvalidProfilePicture(e: InvalidProfilePictureException) = mapOf(
+        RETURN_CODE_KEY to INVALID_PROFILE_PICTURE_CODE,
+        RETURN_MESSAGE_KEY to e.localizedMessage
+    )
+
+    @ExceptionHandler(StorageException::class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    fun onStorageError(e: StorageException) = mapOf(
+        RETURN_CODE_KEY to STORAGE_ERROR_CODE,
+        RETURN_MESSAGE_KEY to e.localizedMessage
+    )
+
     private companion object {
         const val NOT_FOUND_CODE = "NOT_FOUND"
         const val INVALID_CHAT_SIZE_CODE = "INVALID_CHAT_SIZE"
+        const val INVALID_PROFILE_PICTURE_CODE = "INVALID_PROFILE_PICTURE"
+        const val STORAGE_ERROR_CODE = "STORAGE_ERROR"
     }
 }
