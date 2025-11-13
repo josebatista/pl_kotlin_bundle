@@ -1,4 +1,4 @@
-package io.github.josebatista.chirp.controller
+package io.github.josebatista.chirp.api.controller
 
 import io.github.josebatista.chirp.api.config.IpRateLimit
 import io.github.josebatista.chirp.api.dto.AuthenticatedUserDto
