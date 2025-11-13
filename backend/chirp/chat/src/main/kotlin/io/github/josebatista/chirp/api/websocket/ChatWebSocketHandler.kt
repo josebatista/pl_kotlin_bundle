@@ -10,6 +10,7 @@ import io.github.josebatista.chirp.api.dto.ws.OutgoingWebSocketMessageType
 import io.github.josebatista.chirp.api.dto.ws.ProfilePictureUpdateDto
 import io.github.josebatista.chirp.api.dto.ws.SendMessageDto
 import io.github.josebatista.chirp.api.mappers.toChatMessageDto
+import io.github.josebatista.chirp.domain.event.ChatCreatedEvent
 import io.github.josebatista.chirp.domain.event.ChatParticipantsJoinedEvent
 import io.github.josebatista.chirp.domain.event.ChatParticipantsLeftEvent
 import io.github.josebatista.chirp.domain.event.MessageDeletedEvent
@@ -165,20 +166,27 @@ class ChatWebSocketHandler(
         )
     }
 
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    fun onJoinChat(event: ChatParticipantsJoinedEvent) {
+    private fun updateChatForUsers(
+        chatId: ChatId,
+        userIds: List<UserId>
+    ) {
         connectionLock.write {
-            event.userIds.forEach { userId ->
+            userIds.forEach { userId ->
                 userChatIds.compute(/* key = */ userId) { _, chatIds ->
-                    (chatIds ?: mutableSetOf()).apply { add(element = event.chatId) }
+                    (chatIds ?: mutableSetOf()).apply { add(element = chatId) }
                 }
                 userToSessions[userId]?.forEach { sessionId ->
-                    chatToSessions.compute(/* key = */ event.chatId) { _, sessions ->
+                    chatToSessions.compute(/* key = */ chatId) { _, sessions ->
                         (sessions ?: mutableSetOf()).apply { add(element = sessionId) }
                     }
                 }
             }
         }
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    fun onJoinChat(event: ChatParticipantsJoinedEvent) {
+        updateChatForUsers(chatId = event.chatId, userIds = event.userIds.toList())
         broadcastToChat(
             chatId = event.chatId,
             message = OutgoingWebSocketMessage(
@@ -190,6 +198,11 @@ class ChatWebSocketHandler(
                 )
             )
         )
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    fun onChatCreated(event: ChatCreatedEvent) {
+        updateChatForUsers(chatId = event.chatId, userIds = event.participantIds)
     }
 
     override fun handlePongMessage(session: WebSocketSession, message: PongMessage) {

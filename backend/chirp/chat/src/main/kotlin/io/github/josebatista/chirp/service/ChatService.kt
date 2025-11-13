@@ -2,6 +2,7 @@ package io.github.josebatista.chirp.service
 
 import io.github.josebatista.chirp.api.dto.ChatMessageDto
 import io.github.josebatista.chirp.api.mappers.toChatMessageDto
+import io.github.josebatista.chirp.domain.event.ChatCreatedEvent
 import io.github.josebatista.chirp.domain.event.ChatParticipantsJoinedEvent
 import io.github.josebatista.chirp.domain.event.ChatParticipantsLeftEvent
 import io.github.josebatista.chirp.domain.exception.ChatNotFoundException
@@ -90,12 +91,19 @@ class ChatService(
         if (allParticipants.size < 2) throw InvalidChatSizeException()
         val creator = chatParticipantRepository.findByIdOrNull(creatorId)
             ?: throw ChatParticipantNotFoundException(creatorId)
-        return chatRepository.save(
+        return chatRepository.saveAndFlush(
             ChatEntity(
                 creator = creator,
                 participants = setOf(creator) + otherParticipants
             )
-        ).toChat(lastMessage = null)
+        ).toChat(lastMessage = null).also { entity ->
+            applicationEventPublisher.publishEvent(
+                ChatCreatedEvent(
+                    chatId = entity.id,
+                    participantIds = entity.participants.map { it.userId }
+                )
+            )
+        }
     }
 
     @Transactional
