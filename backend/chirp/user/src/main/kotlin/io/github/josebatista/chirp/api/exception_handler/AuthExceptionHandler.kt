@@ -107,7 +107,7 @@ class AuthExceptionHandler {
         e: EmailNotVerifiedException
     ): ResponseEntity<Map<String, Any>> {
         return ResponseEntity
-            .status(HttpStatus.UNAUTHORIZED)
+            .status(HttpStatus.FORBIDDEN)
             .body(
                 mapOf(
                     RETURN_CODE_KEY to EMAIL_NOT_VERIFIED_CODE,
