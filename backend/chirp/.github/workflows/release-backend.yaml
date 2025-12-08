@@ -1,0 +1,42 @@
+name: Release Backend (GHCR + Portainer)
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE_REGISTRY: ghcr.io
+
+jobs:
+  build-and-push:
+    name: Build (Gradle) → Build & Push Docker
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/backend_v')
+    outputs:
+      image: ${{ steps.set-output.outputs.image }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Build jar with Gradle
+        run: |
+          chmod +x ./gradlew
+          ./gradlew clean :app:bootJar --no-daemon
+          JAR_PATH=$(ls app/build/libs/*.jar | head -n1)
+          if [ -z "$JAR_PATH" ]; then
+            echo "Jar not found in build/libs"
+            exit 1
+          fi
+          JAR_NAME=$(basename "$JAR_PATH")
+          echo "JAR_NAME=${JAR_NAME}" >> $GITHUB_OUTPUT
+          echo "Found JAR: $JAR_NAME"
