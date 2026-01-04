@@ -15,6 +15,9 @@ jobs:
   build-and-push:
     name: Build (Gradle) → Build & Push Docker
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend/chirp
     if: startsWith(github.event.release.tag_name, 'backend_v')
 
     env:
@@ -41,7 +44,6 @@ jobs:
 
       - name: Decode Firebase credentials
         run: |
-          cd backend/chirp
           mkdir -p app/src/main/resources/firebase-credentials
           echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT_BASE64 }}" | base64 -d \
             > app/src/main/resources/firebase-credentials/chirp-firebase-adminsdk.json
@@ -49,7 +51,6 @@ jobs:
       - name: Build jar with Gradle
         id: gradle-build
         run: |
-          cd backend/chirp
           chmod +x ./gradlew
           export ORG_GRADLE_JVMARGS="-Xms512m -Xmx2g -XX:MaxMetaspaceSize=512m -Dorg.gradle.instrumentation.agent=false"
           ./gradlew clean :app:bootJar --no-daemon --no-watch-fs
@@ -74,7 +75,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: ./backend/chirp/Dockerfile
+          file: ./Dockerfile
           push: true
           tags: |
             ${{ env.IMAGE_REGISTRY }}/${{ secrets.GHCR_OWNER }}/${{ secrets.IMAGE_NAME }}:${{ github.event.release.tag_name }}
@@ -84,7 +85,6 @@ jobs:
       - name: Cleanup Firebase credentials
         if: always()
         run: |
-          cd backend/chirp
           rm -f app/src/main/resources/firebase-credentials/chirp-firebase-adminsdk.json
           
   deploy:
