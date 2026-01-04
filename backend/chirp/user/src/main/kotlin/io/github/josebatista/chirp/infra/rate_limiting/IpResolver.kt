@@ -29,6 +29,7 @@ class IpResolver(
             "::"
         )
         private const val NGINX_REAL_IP_HEADER = "X-Real-IP"
+        private const val FORWARDED_FOR_HEADER = "X-Forwarded-For"
     }
 
     private val logger = LoggerFactory.getLogger(IpResolver::class.java)
@@ -54,7 +55,8 @@ class IpResolver(
             }
             return remoteAddr
         }
-        val clientIp = extractFromXRealIp(request = request, proxyIp = remoteAddr)
+        val clientIp = extractFromXForwardedFor(request = request, proxyIp = remoteAddr)
+            ?: extractFromXRealIp(request = request, proxyIp = remoteAddr)
         if (clientIp == null) {
             logger.warn("No valid client IP in proxy headers")
             if (nginxConfig.requireProxy) {
@@ -62,6 +64,14 @@ class IpResolver(
             }
         }
         return clientIp ?: remoteAddr
+    }
+
+    private fun extractFromXForwardedFor(request: HttpServletRequest, proxyIp: String): String? {
+        return request.getHeader(FORWARDED_FOR_HEADER)?.let { header ->
+            header.split(",").firstOrNull()?.let { firstIp ->
+                validateAndNormalizeIp(ip = firstIp.trim(), headerName = FORWARDED_FOR_HEADER, proxyIp = proxyIp)
+            }
+        }
     }
 
     private fun extractFromXRealIp(request: HttpServletRequest, proxyIp: String): String? {

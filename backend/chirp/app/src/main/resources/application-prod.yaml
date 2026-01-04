@@ -15,9 +15,9 @@ nginx:
 
 chirp:
   email:
-    url: "https://www.google.com"
+    url: "https://chirp.josebatista.dev"
   rate-limit:
     ip:
       apply-limit: true
   web-socket:
-    allowed-origin: "http://chirp.site.com"
+    allowed-origin: "https://chirp.josebatista.dev"

@@ -5,8 +5,6 @@ import io.github.josebatista.chirp.domain.type.ChatMessageId
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.FetchType
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Index
 import jakarta.persistence.JoinColumn
@@ -30,7 +28,6 @@ import java.time.Instant
 )
 class ChatMessageEntity(
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     var id: ChatMessageId? = null,
 
     @Column(nullable = false)
