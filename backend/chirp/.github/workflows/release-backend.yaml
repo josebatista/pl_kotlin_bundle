@@ -1,0 +1,127 @@
+name: Release Backend (GHCR + Portainer)
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE_REGISTRY: ghcr.io
+
+jobs:
+  build-and-push:
+    name: Build (Gradle) → Build & Push Docker
+    runs-on: ubuntu-latest
+    if: startsWith(github.event.release.tag_name, 'backend_v')
+
+    env:
+      GRADLE_USER_HOME: /tmp/gradle-home
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+
+      - name: Install Node.js (act workaround)
+        if: env.ACT == 'true'
+        run: |
+          apt-get update
+          apt-get install -y nodejs npm
+          node --version
+          npm --version
+
+      - name: Decode Firebase credentials
+        run: |
+          mkdir -p app/src/main/resources/firebase-credentials
+          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT_BASE64 }}" | base64 -d \
+            > app/src/main/resources/firebase-credentials/chirp-firebase-adminsdk.json
+
+      - name: Build jar with Gradle
+        id: gradle-build
+        run: |
+          chmod +x ./gradlew
+          export ORG_GRADLE_JVMARGS="-Xms512m -Xmx2g -XX:MaxMetaspaceSize=512m -Dorg.gradle.instrumentation.agent=false"
+          ./gradlew clean :app:bootJar --no-daemon --no-watch-fs
+          JAR_PATH=$(ls app/build/libs/*.jar | head -n1)
+          if [ -z "$JAR_PATH" ]; then
+            echo "Jar not found in build/libs"
+            exit 1
+          fi
+          JAR_NAME=$(basename "$JAR_PATH")
+          echo "JAR_NAME=${JAR_NAME}" >> $GITHUB_OUTPUT
+          echo "Found JAR: $JAR_NAME"
+
+      - name: Login to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push image to GHCR
+        id: buildpush
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ env.IMAGE_REGISTRY }}/${{ secrets.GHCR_OWNER }}/${{ secrets.IMAGE_NAME }}:${{ github.event.release.tag_name }}
+          build-args: |
+            JAR_NAME=${{ steps.gradle-build.outputs.JAR_NAME }}
+
+      - name: Cleanup Firebase credentials
+        if: always()
+        run: |
+          rm -f app/src/main/resources/firebase-credentials/chirp-firebase-adminsdk.json
+          
+  deploy:
+    name: Deploy via Portainer API
+    runs-on: ubuntu-latest
+    needs: build-and-push
+
+    steps:
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Update stack on Portainer
+        env:
+          PORTAINER_URL: ${{ secrets.PORTAINER_URL }}
+          PORTAINER_TOKEN: ${{ secrets.PORTAINER_API_TOKEN }}
+          STACK_ID: ${{ secrets.PORTAINER_STACK_ID }}
+          ENDPOINT_ID: ${{ secrets.PORTAINER_ENDPOINT_ID }}
+          IMAGE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          echo "Fetching current stack definition from Portainer..."
+
+          STACK=$(curl -s \
+            -H "X-API-Key: $PORTAINER_TOKEN" \
+            "$PORTAINER_URL/api/stacks/$STACK_ID/file")
+
+          COMPOSE=$(echo "$STACK" | jq -r '.StackFileContent')
+
+          echo "Updating image tag to $IMAGE_TAG..."
+
+          UPDATED=$(echo "$COMPOSE" | sed -E \
+            "s|(image:\s*ghcr.io/${{ secrets.GHCR_OWNER }}/${{ secrets.IMAGE_NAME }}:)[^[:space:]]+|\1$IMAGE_TAG|")
+
+          echo "Deploying updated stack..."
+
+          curl -s -X PUT \
+            -H "X-API-Key: $PORTAINER_TOKEN" \
+            -H "Content-Type: application/json" \
+            "$PORTAINER_URL/api/stacks/$STACK_ID?endpointId=$ENDPOINT_ID" \
+            -d "$(jq -n \
+              --arg content "$UPDATED" \
+              '{stackFileContent: $content}')"
+
+          echo "Deployment triggered successfully."
