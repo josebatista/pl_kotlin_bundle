@@ -14,4 +14,4 @@ ENV JAVA_TOOL_OPTIONS="-XX:+UseContainerSupport \
                        -XX:HeapDumpPath=/tmp \
                        -Dfile.encoding=UTF-8"
 
-ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "-jar", "/app/app.jar"]
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]

@@ -71,9 +71,3 @@ jobs:
           tags: ${{ env.IMAGE_REGISTRY }}/${{ secrets.GHCR_OWNER }}/${{ secrets.IMAGE_NAME }}:${{ github.event.release.tag_name }}
           build-args: |
             JAR_NAME=${{ steps.gradle-build.outputs.JAR_NAME }}
-
-      - name: Set outputs (image)
-        id: set-output
-        run: |
-          IMAGE_FULL="${{ env.IMAGE_REGISTRY }}/${{ secrets.GHCR_OWNER }}/${{ secrets.IMAGE_NAME }}:${{ github.ref_name }}"
-          echo "image=${IMAGE_FULL}" >> $GITHUB_OUTPUT
