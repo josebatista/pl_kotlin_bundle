@@ -6,7 +6,8 @@ COPY app/build/libs/app-0.0.1-SNAPSHOT.jar app.jar
 
 EXPOSE 8080
 
-ENV JAVA_TOOL_OPTIONS="-XX:+UseContainerSupport \
+ENV JAVA_TOOL_OPTIONS="-Djava.net.preferIPv4Stack=true \
+                       -XX:+UseContainerSupport \
                        -XX:MaxRAMPercentage=75.0 \
                        -XX:InitialRAMPercentage=50.0 \
                        -XX:MaxMetaspaceSize=256m \

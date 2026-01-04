@@ -39,6 +39,12 @@ jobs:
           node --version
           npm --version
 
+      - name: Decode Firebase credentials
+        run: |
+          mkdir -p app/src/main/resources/firebase-credentials
+          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT_BASE64 }}" | base64 -d \
+            > app/src/main/resources/firebase-credentials/chirp-firebase-adminsdk.json
+
       - name: Build jar with Gradle
         id: gradle-build
         run: |
@@ -71,3 +77,8 @@ jobs:
           tags: ${{ env.IMAGE_REGISTRY }}/${{ secrets.GHCR_OWNER }}/${{ secrets.IMAGE_NAME }}:${{ github.event.release.tag_name }}
           build-args: |
             JAR_NAME=${{ steps.gradle-build.outputs.JAR_NAME }}
+
+      - name: Cleanup Firebase credentials
+        if: always()
+        run: |
+          rm -f app/src/main/resources/firebase-credentials/chirp-firebase-adminsdk.json
