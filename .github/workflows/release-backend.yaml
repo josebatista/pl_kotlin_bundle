@@ -3,6 +3,7 @@ name: Release Backend (GHCR + Portainer)
 on:
   release:
     types: [published]
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -75,7 +76,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: ./Dockerfile
+          file: ./backend/chirp/Dockerfile
           push: true
           tags: |
             ${{ env.IMAGE_REGISTRY }}/${{ secrets.GHCR_OWNER }}/${{ secrets.IMAGE_NAME }}:${{ github.event.release.tag_name }}
