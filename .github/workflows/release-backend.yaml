@@ -110,6 +110,11 @@ jobs:
             -H "X-API-Key: $PORTAINER_TOKEN" \
             "$PORTAINER_URL/api/stacks/$STACK_ID/file")
 
+          echo "=== RAW RESPONSE FROM PORTAINER ==="
+          echo "$STACK"
+
+          echo "===> $STACK" | jq .
+
           COMPOSE=$(echo "$STACK" | jq -r '.StackFileContent')
 
           echo "Updating image tag to $IMAGE_TAG..."
