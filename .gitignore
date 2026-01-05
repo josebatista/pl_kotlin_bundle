@@ -1,1 +1,9 @@
+# MacOS
 .DS_Store
+
+#IntelliJ
+.idea
+
+# ACT
+event.json
+my.secrets
