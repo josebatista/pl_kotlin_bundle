@@ -114,11 +114,6 @@ jobs:
             -H "CF-Access-Client-Secret: $CF_ACCESS_CLIENT_SECRET" \
             "$PORTAINER_URL/api/stacks/$STACK_ID/file")
 
-          echo "=== RAW RESPONSE FROM PORTAINER ==="
-          echo "$STACK"
-
-          echo "===> $STACK" | jq .
-
           COMPOSE=$(echo "$STACK" | jq -r '.StackFileContent')
 
           echo "Updating image tag to $IMAGE_TAG..."
