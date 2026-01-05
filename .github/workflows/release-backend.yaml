@@ -102,12 +102,16 @@ jobs:
           PORTAINER_TOKEN: ${{ secrets.PORTAINER_API_TOKEN }}
           STACK_ID: ${{ secrets.PORTAINER_STACK_ID }}
           ENDPOINT_ID: ${{ secrets.PORTAINER_ENDPOINT_ID }}
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
           IMAGE_TAG: ${{ github.event.release.tag_name }}
         run: |
           echo "Fetching current stack definition from Portainer..."
 
           STACK=$(curl -s \
             -H "X-API-Key: $PORTAINER_TOKEN" \
+            -H "CF_ACCESS_CLIENT_ID: $CF_ACCESS_CLIENT_ID" \
+            -H "CF_ACCESS_CLIENT_SECRET: $CF_ACCESS_CLIENT_SECRET" \
             "$PORTAINER_URL/api/stacks/$STACK_ID/file")
 
           echo "=== RAW RESPONSE FROM PORTAINER ==="
@@ -126,6 +130,8 @@ jobs:
 
           curl -s -X PUT \
             -H "X-API-Key: $PORTAINER_TOKEN" \
+            -H "CF_ACCESS_CLIENT_ID: $CF_ACCESS_CLIENT_ID" \
+            -H "CF_ACCESS_CLIENT_SECRET: $CF_ACCESS_CLIENT_SECRET" \
             -H "Content-Type: application/json" \
             "$PORTAINER_URL/api/stacks/$STACK_ID?endpointId=$ENDPOINT_ID" \
             -d "$(jq -n \
