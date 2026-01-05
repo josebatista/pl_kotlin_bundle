@@ -3,7 +3,6 @@ name: Release Backend (GHCR + Portainer)
 on:
   release:
     types: [published]
-  workflow_dispatch:
 
 permissions:
   contents: read
@@ -75,7 +74,7 @@ jobs:
         id: buildpush
         uses: docker/build-push-action@v4
         with:
-          context: .
+          context: ./backend/chirp
           file: ./backend/chirp/Dockerfile
           push: true
           tags: |
