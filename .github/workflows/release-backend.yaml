@@ -112,6 +112,18 @@ jobs:
             -H "X-API-Key: $PORTAINER_TOKEN" \
             -H "CF-Access-Client-Id: $CF_ACCESS_CLIENT_ID" \
             -H "CF-Access-Client-Secret: $CF_ACCESS_CLIENT_SECRET" \
+            "$PORTAINER_URL/api/stacks/$STACK_ID")
+
+          STACK_ENV=$(echo "$STACK" | jq -r 'Env')
+
+          echo "=============="
+          echo "$STACK_ENV"
+          echo "=============="
+
+          STACK=$(curl -s \
+            -H "X-API-Key: $PORTAINER_TOKEN" \
+            -H "CF-Access-Client-Id: $CF_ACCESS_CLIENT_ID" \
+            -H "CF-Access-Client-Secret: $CF_ACCESS_CLIENT_SECRET" \
             "$PORTAINER_URL/api/stacks/$STACK_ID/file")
 
           COMPOSE=$(echo "$STACK" | jq -r '.StackFileContent')
@@ -123,7 +135,7 @@ jobs:
 
           echo "Deploying updated stack..."
 
-          curl -s -X PUT \
+          curl -v -X PUT \
             -H "X-API-Key: $PORTAINER_TOKEN" \
             -H "CF-Access-Client-Id: $CF_ACCESS_CLIENT_ID" \
             -H "CF-Access-Client-Secret: $CF_ACCESS_CLIENT_SECRET" \
@@ -131,6 +143,7 @@ jobs:
             "$PORTAINER_URL/api/stacks/$STACK_ID?endpointId=$ENDPOINT_ID" \
             -d "$(jq -n \
               --arg content "$UPDATED" \
-              '{stackFileContent: $content}')"
+              --arg stack_env "$STACK_ENV"
+              '{env: $stack_env, stackFileContent: $content}')"
 
           echo "Deployment triggered successfully."
