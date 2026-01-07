@@ -114,7 +114,11 @@ jobs:
             -H "CF-Access-Client-Secret: $CF_ACCESS_CLIENT_SECRET" \
             "$PORTAINER_URL/api/stacks/$STACK_ID")
 
-          STACK_ENV=$(echo "$STACK" | jq -r 'Env')
+          echo "=============="
+          echo "$STACK"
+          echo "=============="
+
+          STACK_ENV=$(echo "$STACK" | jq -r '.Env')
 
           echo "=============="
           echo "$STACK_ENV"
