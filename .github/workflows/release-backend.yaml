@@ -114,15 +114,7 @@ jobs:
             -H "CF-Access-Client-Secret: $CF_ACCESS_CLIENT_SECRET" \
             "$PORTAINER_URL/api/stacks/$STACK_ID")
 
-          echo "=============="
-          echo "$STACK"
-          echo "=============="
-
           STACK_ENV=$(echo "$STACK" | jq -r '.Env')
-
-          echo "=============="
-          echo "$STACK_ENV"
-          echo "=============="
 
           STACK=$(curl -s \
             -H "X-API-Key: $PORTAINER_TOKEN" \
@@ -139,7 +131,12 @@ jobs:
 
           echo "Deploying updated stack..."
 
-          curl -v -X PUT \
+          JSON_REQUEST=$(jq -n \
+              --arg content "$UPDATED" \
+              --arg stack_env "$STACK_ENV"
+              '{env: $stack_env, stackFileContent: $content}')
+
+          curl -X PUT \
             -H "X-API-Key: $PORTAINER_TOKEN" \
             -H "CF-Access-Client-Id: $CF_ACCESS_CLIENT_ID" \
             -H "CF-Access-Client-Secret: $CF_ACCESS_CLIENT_SECRET" \
@@ -147,7 +144,7 @@ jobs:
             "$PORTAINER_URL/api/stacks/$STACK_ID?endpointId=$ENDPOINT_ID" \
             -d "$(jq -n \
               --arg content "$UPDATED" \
-              --arg stack_env "$STACK_ENV"
+              --arg stack_env "$STACK_ENV" \
               '{env: $stack_env, stackFileContent: $content}')"
 
           echo "Deployment triggered successfully."
