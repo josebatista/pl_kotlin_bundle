@@ -131,7 +131,7 @@ jobs:
 
           echo "Deploying updated stack..."
 
-          curl -v -X PUT \
+          curl --trace-ascii - -X PUT \
             -H "X-API-Key: $PORTAINER_TOKEN" \
             -H "CF-Access-Client-Id: $CF_ACCESS_CLIENT_ID" \
             -H "CF-Access-Client-Secret: $CF_ACCESS_CLIENT_SECRET" \
