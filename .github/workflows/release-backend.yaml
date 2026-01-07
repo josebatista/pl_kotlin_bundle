@@ -76,6 +76,7 @@ jobs:
         with:
           context: ./backend/chirp
           file: ./backend/chirp/Dockerfile
+          platforms: linux/arm64
           push: true
           tags: |
             ${{ env.IMAGE_REGISTRY }}/${{ secrets.GHCR_OWNER }}/${{ secrets.IMAGE_NAME }}:${{ github.event.release.tag_name }}
@@ -131,7 +132,7 @@ jobs:
 
           echo "Deploying updated stack..."
 
-          curl --trace-ascii - -X PUT \
+          curl -s -X PUT \
             -H "X-API-Key: $PORTAINER_TOKEN" \
             -H "CF-Access-Client-Id: $CF_ACCESS_CLIENT_ID" \
             -H "CF-Access-Client-Secret: $CF_ACCESS_CLIENT_SECRET" \
