@@ -1,4 +1,4 @@
-name: Release Backend (GHCR + Portainer)
+name: Release Backend
 
 on:
   release:
@@ -89,7 +89,7 @@ jobs:
           rm -f app/src/main/resources/firebase-credentials/chirp-firebase-adminsdk.json
           
   deploy:
-    name: Deploy via Portainer API
+    name: Deploy via API
     runs-on: ubuntu-latest
     needs: build-and-push
 
@@ -97,7 +97,7 @@ jobs:
       - name: Install jq
         run: sudo apt-get update && sudo apt-get install -y jq
 
-      - name: Update stack on Portainer
+      - name: Update stack
         env:
           PORTAINER_URL: ${{ secrets.PORTAINER_URL }}
           PORTAINER_TOKEN: ${{ secrets.PORTAINER_API_TOKEN }}
@@ -105,42 +105,62 @@ jobs:
           ENDPOINT_ID: ${{ secrets.PORTAINER_ENDPOINT_ID }}
           CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
           CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+          GHCR_OWNER: ${{ secrets.GHCR_OWNER }}
+          IMAGE_NAME: ${{ secrets.IMAGE_NAME }}
           IMAGE_TAG: ${{ github.event.release.tag_name }}
         run: |
-          echo "Fetching current stack definition from Portainer..."
+          set -Eeuo pipefail
 
-          STACK=$(curl -s \
+          echo "::add-mask::$PORTAINER_TOKEN"
+          echo "::add-mask::$CF_ACCESS_CLIENT_ID"
+          echo "::add-mask::$CF_ACCESS_CLIENT_SECRET"
+
+          echo "Fetching current stack definition..."
+
+          STACK_JSON=$(curl -sS \
             -H "X-API-Key: $PORTAINER_TOKEN" \
             -H "CF-Access-Client-Id: $CF_ACCESS_CLIENT_ID" \
             -H "CF-Access-Client-Secret: $CF_ACCESS_CLIENT_SECRET" \
-            "$PORTAINER_URL/api/stacks/$STACK_ID")
+            "$PORTAINER_URL/api/stacks/$STACK_ID"
+          )
 
-          STACK_ENV=$(echo "$STACK" | jq '.Env')
+          STACK_ENV=$(echo "$STACK_JSON" | jq '.Env')
 
-          STACK=$(curl -s \
+          STACK_FILE=$(curl -sS \
             -H "X-API-Key: $PORTAINER_TOKEN" \
             -H "CF-Access-Client-Id: $CF_ACCESS_CLIENT_ID" \
             -H "CF-Access-Client-Secret: $CF_ACCESS_CLIENT_SECRET" \
-            "$PORTAINER_URL/api/stacks/$STACK_ID/file")
+            "$PORTAINER_URL/api/stacks/$STACK_ID/file"
+          )
 
-          COMPOSE=$(echo "$STACK" | jq -r '.StackFileContent')
+          COMPOSE=$(echo "$STACK_FILE" | jq -r '.StackFileContent')
 
           echo "Updating image tag to $IMAGE_TAG..."
 
           UPDATED=$(echo "$COMPOSE" | sed -E \
-            "s|(image:\s*ghcr.io/${{ secrets.GHCR_OWNER }}/${{ secrets.IMAGE_NAME }}:)[^[:space:]]+|\1$IMAGE_TAG|")
+            "s|(image:\s*ghcr.io/${GHCR_OWNER}/${IMAGE_NAME}:)[^[:space:]]+|\1$IMAGE_TAG|"
+          )
 
           echo "Deploying updated stack..."
 
-          curl -s -X PUT \
+          JSON_REQUEST=$(jq -n \
+              --arg content "$UPDATED" \
+              --argjson stack_env "$STACK_ENV" \
+              '{env: $stack_env, stackFileContent: $content}'
+          )
+
+          HTTP_STATUS=$(curl -sS -o /dev/null -w "%{http_code}" -X PUT \
             -H "X-API-Key: $PORTAINER_TOKEN" \
             -H "CF-Access-Client-Id: $CF_ACCESS_CLIENT_ID" \
             -H "CF-Access-Client-Secret: $CF_ACCESS_CLIENT_SECRET" \
             -H "Content-Type: application/json" \
             "$PORTAINER_URL/api/stacks/$STACK_ID?endpointId=$ENDPOINT_ID" \
-            -d "$(jq -n \
-              --arg content "$UPDATED" \
-              --argjson stack_env "$STACK_ENV" \
-              '{env: $stack_env, stackFileContent: $content}')"
+            -d "$JSON_REQUEST"
+          )
 
-          echo "Deployment triggered successfully."
+          if [[ "$HTTP_STATUS" -lt 200 || "$HTTP_STATUS" -ge 300 ]]; then
+            echo "❌ Deployment failed (HTTP $HTTP_STATUS)"
+            exit 1
+          fi
+          
+          echo "✅ Deployment triggered successfully (HTTP $HTTP_STATUS)"
