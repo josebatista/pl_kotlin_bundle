@@ -25,11 +25,12 @@ core = "1.7.0"
 
 androidDesugarJdkLibs = "2.1.5"
 
-
 [libraries]
 androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
 androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+
+ui-tooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.ref = "composeMultiplatform" }
 
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
@@ -57,6 +58,7 @@ compose-gradlePlugin = { group = "org.jetbrains.kotlin", name = "compose-compile
 # Convention PLugins
 convention-android-application = { id = "dev.josebatista.convention.android.application", version = "unspecified" }
 convention-android-application-compose = { id = "dev.josebatista.convention.android.application.compose", version = "unspecified" }
+convention-cmp-application = { id = "dev.josebatista.convention.cmp.application", version = "unspecified" }
 
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
