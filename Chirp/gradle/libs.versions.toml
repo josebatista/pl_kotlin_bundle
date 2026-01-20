@@ -23,6 +23,9 @@ kotlinStdlib = "2.3.0"
 runner = "1.7.0"
 core = "1.7.0"
 
+# Kotlinx
+kotlinx-serialization = "1.9.0"
+
 androidDesugarJdkLibs = "2.1.5"
 
 [libraries]
@@ -32,6 +35,7 @@ androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-toolin
 
 ui-tooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.ref = "composeMultiplatform" }
 
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 kotlin-testJunit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 junit = { module = "junit:junit", version.ref = "junit" }
@@ -59,6 +63,7 @@ compose-gradlePlugin = { group = "org.jetbrains.kotlin", name = "compose-compile
 convention-android-application = { id = "dev.josebatista.convention.android.application", version = "unspecified" }
 convention-android-application-compose = { id = "dev.josebatista.convention.android.application.compose", version = "unspecified" }
 convention-cmp-application = { id = "dev.josebatista.convention.cmp.application", version = "unspecified" }
+convention-kmp-library = { id = "dev.josebatista.convention.kmp.library", version = "unspecified" }
 
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
@@ -68,3 +73,4 @@ composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "k
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 androidKotlinMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 androidLint = { id = "com.android.lint", version.ref = "agp" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
