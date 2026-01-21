@@ -13,11 +13,12 @@ class CmpApplicationConventionPlugin : Plugin<Project> {
                 apply("dev.josebatista.convention.android.application.compose")
                 apply("org.jetbrains.kotlin.multiplatform")
                 apply("org.jetbrains.compose")
+                apply("org.jetbrains.kotlin.plugin.compose")
             }
             configureAndroidTarget()
             configureIosTargets()
             dependencies {
-                "debugImplementation"(libs.findLibrary("ui-tooling").get())
+                "debugImplementation"(libs.findLibrary("androidx-compose-ui-tooling").get())
             }
         }
     }
