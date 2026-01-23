@@ -11,6 +11,9 @@ dependencies {
     compileOnly(libs.android.tools.common)
     compileOnly(libs.kotlin.gradlePlugin)
     compileOnly(libs.compose.gradlePlugin)
+    compileOnly(libs.ksp.gradlePlugin)
+    implementation(libs.buildkonfig.gradlePlugin)
+    implementation(libs.buildkonfig.compiler)
 }
 
 java {
@@ -56,6 +59,10 @@ gradlePlugin {
         register("cmpFeature") {
             id = "dev.josebatista.convention.cmp.feature"
             implementationClass = "CmpFeatureConventionPlugin"
+        }
+        register("buildKonfig") {
+            id = "dev.josebatista.convention.buildkonfig"
+            implementationClass = "BuildKonfigConventionPlugin"
         }
     }
 }
