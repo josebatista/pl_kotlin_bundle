@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.convention.cmp.feature)
+    alias(libs.plugins.convention.cmp.library)
 }
 
 kotlin {
@@ -14,10 +14,7 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(libs.kotlin.stdlib)
-                implementation(projects.core.domain)
-                implementation(projects.core.designsystem)
-                implementation(projects.core.presentation)
-                implementation(projects.feature.chat.domain)
+                // Add KMP dependencies here
             }
         }
 
