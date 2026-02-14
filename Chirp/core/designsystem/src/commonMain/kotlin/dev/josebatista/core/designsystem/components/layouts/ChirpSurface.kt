@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -16,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import chirp.core.designsystem.generated.resources.Res
 import chirp.core.designsystem.generated.resources.logo_chirp
+import dev.josebatista.core.designsystem.components.brand.ChirpBrandLogo
 import dev.josebatista.core.designsystem.theme.ChirpTheme
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -46,6 +49,8 @@ fun ChirpSurface(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
+                        .padding(horizontal = 16.dp)
+                        .verticalScroll(rememberScrollState())
                 ) {
                     content()
                 }
@@ -62,10 +67,7 @@ private fun ChirpSurfaceLightThemePreview() {
             modifier = Modifier
                 .fillMaxSize(),
             header = {
-                Icon(
-                    imageVector = vectorResource(Res.drawable.logo_chirp),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
+                ChirpBrandLogo(
                     modifier = Modifier
                         .padding(vertical = 32.dp)
                 )
