@@ -9,6 +9,8 @@ import dev.josebatista.core.presentation.util.PreviewScreens
 @PreviewScreens
 fun App() {
     ChirpTheme {
-        RegisterRoot()
+        RegisterRoot(
+            onRegisterSuccess = {}
+        )
     }
 }
