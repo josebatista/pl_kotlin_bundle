@@ -10,7 +10,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import chirp.feature.auth.presentation.generated.resources.Res
 import chirp.feature.auth.presentation.generated.resources.email
 import chirp.feature.auth.presentation.generated.resources.email_placeholder
@@ -33,10 +32,11 @@ import dev.josebatista.core.designsystem.theme.ChirpTheme
 import dev.josebatista.core.presentation.util.ObserveAsEvents
 import dev.josebatista.core.presentation.util.PreviewScreens
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun RegisterRoot(
-    viewModel: RegisterViewModel = viewModel(),
+    viewModel: RegisterViewModel = koinViewModel(),
     onRegisterSuccess: (String) -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
