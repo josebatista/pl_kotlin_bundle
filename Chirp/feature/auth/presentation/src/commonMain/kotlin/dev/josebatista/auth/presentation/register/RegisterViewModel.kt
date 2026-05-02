@@ -98,7 +98,10 @@ class RegisterViewModel(
                     email = email,
                     password = password,
                 )
-                .onSuccess { _state.update { it.copy(isRegistering = false) } }
+                .onSuccess {
+                    _state.update { it.copy(isRegistering = false) }
+                    eventChannel.send(RegisterEvent.Success(email = email))
+                }
                 .onFailure { error ->
                     val registrationError = when (error) {
                         DataError.Remote.CONFLICT -> UiText.Resource(Res.string.error_account_exists)
