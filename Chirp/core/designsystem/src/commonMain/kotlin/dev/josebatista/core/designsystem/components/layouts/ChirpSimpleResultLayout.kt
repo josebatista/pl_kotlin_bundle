@@ -1,6 +1,7 @@
 package dev.josebatista.core.designsystem.components.layouts
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,10 +22,10 @@ import dev.josebatista.core.designsystem.theme.extended
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
-fun ChirpSimpleSuccessLayout(
+fun ChirpSimpleResultLayout(
     title: String,
     description: String,
-    icon: @Composable () -> Unit,
+    icon: @Composable ColumnScope.() -> Unit,
     primaryButton: @Composable () -> Unit,
     secondaryButton: @Composable (() -> Unit)? = null,
     secondaryError: String? = null,
@@ -80,7 +81,7 @@ fun ChirpSimpleSuccessLayout(
 @Composable
 private fun ChirpSimpleSuccessLayoutLightThemePreview() {
     ChirpTheme {
-        ChirpSimpleSuccessLayout(
+        ChirpSimpleResultLayout(
             title = "Hello world!",
             description = "Test description",
             icon = {
@@ -111,7 +112,7 @@ private fun ChirpSimpleSuccessLayoutLightThemePreview() {
 @Composable
 private fun ChirpSimpleSuccessLayoutDarkThemePreview() {
     ChirpTheme(darkTheme = true) {
-        ChirpSimpleSuccessLayout(
+        ChirpSimpleResultLayout(
             title = "Hello world!",
             description = "Test description",
             icon = {

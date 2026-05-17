@@ -17,7 +17,7 @@ import dev.josebatista.core.designsystem.components.brand.ChirpSuccessIcon
 import dev.josebatista.core.designsystem.components.buttons.ChirpButton
 import dev.josebatista.core.designsystem.components.buttons.ChirpButtonStyle
 import dev.josebatista.core.designsystem.components.layouts.ChirpAdaptiveResultLayout
-import dev.josebatista.core.designsystem.components.layouts.ChirpSimpleSuccessLayout
+import dev.josebatista.core.designsystem.components.layouts.ChirpSimpleResultLayout
 import dev.josebatista.core.designsystem.components.layouts.ChirpSnackbarScaffold
 import dev.josebatista.core.designsystem.theme.ChirpTheme
 import dev.josebatista.core.presentation.util.ObserveAsEvents
@@ -56,7 +56,7 @@ fun RegisterSuccessScreen(
         snackbarHostState = snackbarHostState
     ) {
         ChirpAdaptiveResultLayout {
-            ChirpSimpleSuccessLayout(
+            ChirpSimpleResultLayout(
                 title = stringResource(Res.string.account_successfully_created),
                 description = stringResource(
                     Res.string.verification_email_sent_to_x, state.registeredEmail
