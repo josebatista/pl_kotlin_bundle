@@ -1,5 +1,6 @@
 package dev.josebatista.core.data.auth
 
+import dev.josebatista.core.data.dto.requests.EmailRequest
 import dev.josebatista.core.data.dto.requests.RegisterRequest
 import dev.josebatista.core.data.networking.post
 import dev.josebatista.core.domain.auth.AuthService
@@ -22,6 +23,13 @@ class KtorAuthService(
                 email = email,
                 password = password
             )
+        )
+    }
+
+    override suspend fun resendVerificationEmail(email: String): EmptyResult<DataError.Remote> {
+        return httpClient.post(
+            route = "/auth/resend-verification",
+            body = EmailRequest(email = email)
         )
     }
 }
