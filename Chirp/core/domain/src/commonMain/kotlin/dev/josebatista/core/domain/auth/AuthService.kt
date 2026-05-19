@@ -2,8 +2,14 @@ package dev.josebatista.core.domain.auth
 
 import dev.josebatista.core.domain.util.DataError
 import dev.josebatista.core.domain.util.EmptyResult
+import dev.josebatista.core.domain.util.Result
 
 interface AuthService {
+    suspend fun login(
+        email: String,
+        password: String
+    ): Result<AuthInfo, DataError.Remote>
+
     suspend fun register(
         username: String,
         email: String,

@@ -43,7 +43,7 @@ class RegisterViewModel(
             }
         }.stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
+            started = SharingStarted.WhileSubscribed(5_000L),
             initialValue = RegisterState()
         )
 
