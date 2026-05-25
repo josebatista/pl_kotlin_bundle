@@ -1,9 +1,11 @@
 package dev.josebatista.core.data.di
 
+import dev.josebatista.core.data.auth.DataStoreSessionStorage
 import dev.josebatista.core.data.auth.KtorAuthService
 import dev.josebatista.core.data.logging.KermitLogger
 import dev.josebatista.core.data.networking.HttpClientFactory
 import dev.josebatista.core.domain.auth.AuthService
+import dev.josebatista.core.domain.auth.SessionStorage
 import dev.josebatista.core.domain.logging.ChirpLogger
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
@@ -20,4 +22,5 @@ val coreDataModule = module {
     }
 //    single<AuthService> { KtorAuthService(httpClient = get()) }
     singleOf(::KtorAuthService) bind AuthService::class
+    singleOf(::DataStoreSessionStorage) bind SessionStorage::class
 }
