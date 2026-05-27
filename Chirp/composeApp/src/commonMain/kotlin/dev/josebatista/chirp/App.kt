@@ -10,6 +10,7 @@ import dev.josebatista.chat.presentation.chat_list.ChatListRoute
 import dev.josebatista.chirp.navigation.DeepLinkListener
 import dev.josebatista.chirp.navigation.NavigationRoot
 import dev.josebatista.core.designsystem.theme.ChirpTheme
+import dev.josebatista.core.presentation.util.ObserveAsEvents
 import dev.josebatista.core.presentation.util.PreviewScreens
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -23,6 +24,17 @@ fun App(
     DeepLinkListener(navController)
     val state by viewModel.state.collectAsStateWithLifecycle()
     LaunchedEffect(state.isCheckingAuth) { if (!state.isCheckingAuth) onAuthenticationChecked() }
+    ObserveAsEvents(viewModel.events) { event ->
+        when (event) {
+            is MainEvent.OnSessionExpired -> {
+                navController.navigate(AuthGraphRoutes.Graph) {
+                    popUpTo(AuthGraphRoutes.Graph) {
+                        inclusive = false
+                    }
+                }
+            }
+        }
+    }
     ChirpTheme {
         if (!state.isCheckingAuth) {
             NavigationRoot(
