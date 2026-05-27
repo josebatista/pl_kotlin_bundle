@@ -4,6 +4,8 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import dev.josebatista.core.data.dto.AuthInfoSerializable
+import dev.josebatista.core.data.mappers.toDomain
 import dev.josebatista.core.data.mappers.toSerializable
 import dev.josebatista.core.domain.auth.AuthInfo
 import dev.josebatista.core.domain.auth.SessionStorage
@@ -20,7 +22,7 @@ class DataStoreSessionStorage(
     override fun observeAuthInfo(): Flow<AuthInfo?> {
         return dataStore.data.map { preferences ->
             val serializedJson = preferences[authInfoKey]
-            serializedJson?.let { json.decodeFromString(it) }
+            serializedJson?.let { json.decodeFromString<AuthInfoSerializable>(it).toDomain() }
         }
     }
 
