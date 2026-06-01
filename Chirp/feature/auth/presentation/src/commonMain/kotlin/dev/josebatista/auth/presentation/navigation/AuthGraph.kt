@@ -10,6 +10,7 @@ import dev.josebatista.auth.presentation.forgot_password.ForgotPasswordRoot
 import dev.josebatista.auth.presentation.login.LoginRoot
 import dev.josebatista.auth.presentation.register.RegisterRoot
 import dev.josebatista.auth.presentation.register_success.RegisterSuccessRoot
+import dev.josebatista.auth.presentation.reset_password.ResetPasswordScreenRoot
 
 fun NavGraphBuilder.authGraph(
     navController: NavController,
@@ -89,6 +90,20 @@ fun NavGraphBuilder.authGraph(
         }
         composable<AuthGraphRoutes.ForgotPassword> {
             ForgotPasswordRoot()
+        }
+        composable<AuthGraphRoutes.ResetPassword>(
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern =
+                        "https://chirp.josebatista.dev/api/auth/reset-password?token={token}"
+                },
+                navDeepLink {
+                    uriPattern =
+                        "chirp://chirp.josebatista.dev/api/auth/reset-password?token={token}"
+                },
+            )
+        ) {
+            ResetPasswordScreenRoot()
         }
     }
 }

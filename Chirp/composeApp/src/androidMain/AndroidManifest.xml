@@ -25,10 +25,11 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <!-- https://chirp.josebatista.dev/api/auth/verify -->
-                <data
-                    android:host="chirp.josebatista.dev"
-                    android:pathPrefix="/api/auth/verify"
-                    android:scheme="https" />
+                <data android:scheme="https" />
+                <data android:host="chirp.josebatista.dev" />
+
+                <data android:pathPrefix="/api/auth/verify" />
+                <data android:pathPrefix="/api/auth/reset-password" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -37,10 +38,11 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <!-- chirp://chirp.josebatista.dev/api/auth/verify -->
-                <data
-                    android:host="chirp.josebatista.dev"
-                    android:pathPrefix="/api/auth/verify"
-                    android:scheme="chirp" />
+                <data android:scheme="chirp" />
+                <data android:host="chirp.josebatista.dev" />
+
+                <data android:pathPrefix="/api/auth/verify" />
+                <data android:pathPrefix="/api/auth/reset-password" />
             </intent-filter>
         </activity>
     </application>
