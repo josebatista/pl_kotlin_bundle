@@ -20,6 +20,7 @@ import chirp.feature.auth.presentation.generated.resources.submit
 import dev.josebatista.core.designsystem.components.brand.ChirpBrandLogo
 import dev.josebatista.core.designsystem.components.buttons.ChirpButton
 import dev.josebatista.core.designsystem.components.layouts.ChirpAdaptiveFormLayout
+import dev.josebatista.core.designsystem.components.layouts.ChirpSnackbarScaffold
 import dev.josebatista.core.designsystem.components.textfields.ChirpPasswordTextField
 import dev.josebatista.core.designsystem.theme.ChirpTheme
 import dev.josebatista.core.designsystem.theme.extended
@@ -43,45 +44,47 @@ private fun ResetPasswordScreen(
     state: ResetPasswordState,
     onAction: (ResetPasswordAction) -> Unit
 ) {
-    ChirpAdaptiveFormLayout(
-        headerText = stringResource(Res.string.set_new_password),
-        errorText = state.errorText?.asString(),
-        logo = {
-            ChirpBrandLogo()
-        }
-    ) {
-        ChirpPasswordTextField(
-            state = state.passwordTextState,
-            modifier = Modifier
-                .fillMaxWidth(),
-            placeholder = stringResource(Res.string.password),
-            title = stringResource(Res.string.password),
-            supportingText = stringResource(Res.string.password_hint),
-            isPasswordVisible = state.isPasswordVisible,
-            onToggleVisibilityClick = {
-                onAction(ResetPasswordAction.OnTogglePasswordVisibilityClick)
+    ChirpSnackbarScaffold {
+        ChirpAdaptiveFormLayout(
+            headerText = stringResource(Res.string.set_new_password),
+            errorText = state.errorText?.asString(),
+            logo = {
+                ChirpBrandLogo()
             }
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        ChirpButton(
-            text = stringResource(Res.string.submit),
-            onClick = {
-                onAction(ResetPasswordAction.OnSubmitClick)
-            },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !state.isLoading && state.canSubmit,
-            isLoading = state.isLoading
-        )
-        if (state.isResetSuccessful) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = stringResource(Res.string.reset_password_successfully),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.extended.success,
+        ) {
+            ChirpPasswordTextField(
+                state = state.passwordTextState,
                 modifier = Modifier
                     .fillMaxWidth(),
-                textAlign = TextAlign.Center
+                placeholder = stringResource(Res.string.password),
+                title = stringResource(Res.string.password),
+                supportingText = stringResource(Res.string.password_hint),
+                isPasswordVisible = state.isPasswordVisible,
+                onToggleVisibilityClick = {
+                    onAction(ResetPasswordAction.OnTogglePasswordVisibilityClick)
+                }
             )
+            Spacer(modifier = Modifier.height(16.dp))
+            ChirpButton(
+                text = stringResource(Res.string.submit),
+                onClick = {
+                    onAction(ResetPasswordAction.OnSubmitClick)
+                },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !state.isLoading && state.canSubmit,
+                isLoading = state.isLoading
+            )
+            if (state.isResetSuccessful) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = stringResource(Res.string.reset_password_successfully),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.extended.success,
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            }
         }
     }
 }
