@@ -34,6 +34,7 @@ import dev.josebatista.core.designsystem.theme.ChirpTheme
 import dev.josebatista.core.designsystem.theme.extended
 import dev.josebatista.core.presentation.util.DeviceConfiguration
 import dev.josebatista.core.presentation.util.PreviewScreens
+import dev.josebatista.core.presentation.util.clearFocusOnTap
 import dev.josebatista.core.presentation.util.currentDeviceConfiguration
 
 @Composable
@@ -54,6 +55,7 @@ fun ChirpAdaptiveFormLayout(
         DeviceConfiguration.MOBILE_PORTRAIT -> {
             ChirpSurface(
                 modifier = modifier
+                    .clearFocusOnTap()
                     .consumeWindowInsets(WindowInsets.navigationBars)
                     .consumeWindowInsets(WindowInsets.displayCutout),
                 header = {
