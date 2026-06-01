@@ -8,7 +8,7 @@ class CmpFeatureConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             with(pluginManager) {
-                apply("dev.josebatista.convention.kmp.library")
+                apply("dev.josebatista.convention.cmp.library")
             }
             dependencies {
                 "commonMainImplementation"(project(":core:designsystem"))

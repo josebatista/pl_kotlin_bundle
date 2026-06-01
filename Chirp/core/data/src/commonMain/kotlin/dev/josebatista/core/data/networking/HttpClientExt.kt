@@ -22,8 +22,8 @@ expect suspend fun <T> platformSafeCall(
 
 suspend inline fun <reified Request, reified Response : Any> HttpClient.post(
     route: String,
-    queryParams: Map<String, String> = emptyMap(),
     body: Request,
+    queryParams: Map<String, String> = emptyMap(),
     crossinline builder: HttpRequestBuilder.() -> Unit = {}
 ): Result<Response, DataError.Remote> {
     return safeCall {
@@ -66,8 +66,8 @@ suspend inline fun <reified Response : Any> HttpClient.delete(
 
 suspend inline fun <reified Request, reified Response : Any> HttpClient.put(
     route: String,
-    queryParams: Map<String, String> = emptyMap(),
     body: Request,
+    queryParams: Map<String, String> = emptyMap(),
     crossinline builder: HttpRequestBuilder.() -> Unit = {}
 ): Result<Response, DataError.Remote> {
     return safeCall {
@@ -101,6 +101,7 @@ suspend inline fun <reified T> responseToResult(response: HttpResponse): Result<
         403 -> Result.Failure(DataError.Remote.FORBIDDEN)
         404 -> Result.Failure(DataError.Remote.NOT_FOUND)
         408 -> Result.Failure(DataError.Remote.REQUEST_TIMEOUT)
+        409 -> Result.Failure(DataError.Remote.CONFLICT)
         413 -> Result.Failure(DataError.Remote.PAYLOAD_TOO_LARGE)
         429 -> Result.Failure(DataError.Remote.TOO_MANY_REQUESTS)
         500 -> Result.Failure(DataError.Remote.SERVER_ERROR)
